@@ -38,17 +38,11 @@ class quadratic():
         g = gradient(loss, self.coefs)
         s = -g
 
-        print(s)
-        print(s**2)
         counter = 0
         while np.sqrt(np.sum(s**2)) > epsilon:
             f = lambda lamda: loss(self.coefs + lamda * s)
-            res = golden_search(f, [-100000000000, 1000000000000])
-            self.coefs = self.coefs + s * res
-            print('coef = {}'.format(self.coefs))
-            print(res)
-            print('output = {}'.format(self.val(x, self.coefs)))
-            print()
+            res = golden_search(f, [-1000000, 1000000])
+            self.coefs += s * res
 
             g_next = gradient(loss, self.coefs)
             s = -g_next + g_next.dot(g_next)/g.dot(g) * s
@@ -59,22 +53,18 @@ class quadratic():
                 g = gradient(loss, self.coefs)
                 s = -g
 
-        print('\ndone\n')
 
 
 def gradient(func, coefs):
 
     coefs = np.array(coefs, dtype = np.float64)
-    dx = sys.float_info.epsilon
+    dx = 0.00000000001
     res = []
     for i in range(len(coefs)):
         d_coefs = coefs.copy()
         d_coefs[i] += dx
-        print(d_coefs)
-        print(coefs)
         res.append((func(d_coefs) - func(coefs)) / dx)
 
-    print(res)
     return np.array(res)
 
 
