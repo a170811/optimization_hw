@@ -5,6 +5,8 @@ import time
 from golden_search import golden_search
 from armijo import armijo
 
+x = [0, 1, 2.2, 3, 4.1, 5.2, 5.9, 6.8, 8.1, 8.7, 9.2, 11, 12.4, 14.1, 15.2, 16.8, 18.7, 19.9]
+y = [30, 27, 29, 30, 37.3, 36.4, 32.4, 28.5, 30, 34.1, 39, 36, 32, 28, 22, 20, 27, 40]
 
 class quadratic():
     def __init__(self, order, coefs = []):
@@ -58,6 +60,36 @@ class quadratic():
                 g = gradient(loss, self.coefs)
                 s = -g
 
+    def DFP(self, x, y ,epsilon = 0.000005):
+        x = np.array(x, dtype = np.float64)
+        y = np.array(y, dtype = np.float64)
+
+        self.B = np.identity(self.order)
+
+        loss = lambda coefs: self.loss_func(x, y, coefs)
+        g = gradient(loss, self.coefs)
+
+        while(np.sqrt(np.sum(g**2)) > epsilon):
+
+            s = -self.B.dot(g)
+
+            f = lambda lamda: loss(self.coefs + lamda * s)
+            ran = armijo(f)
+            lamda_s = golden_search(f, [0, ran*1.2])
+            d_ = np.expand_dims(s * lamda_s, 1)
+            self.coefs += d_.T[0]
+
+            g_next = gradient(loss, self.coefs)
+
+            g_ = np.expand_dims(g_next - g, 1)
+            if np.sqrt(np.sum(g_.flatten()**2)) < epsilon:
+                break
+            M = d_.dot(d_.T) / d_.T.dot(g_)
+
+            tmp = self.B.dot(g_)
+            N = -np.dot(tmp, tmp.T) / g_.T.dot(tmp)
+            self.B += (M + N)
+            g = g_next
 
 
 def gradient(func, coefs):
@@ -103,11 +135,46 @@ def q2_result():
         print('\ta{} = {:.5f}'.format(i, c))
 
     print('\n\tIt cost {:.3f} seconds.'.format(t2 - t1))
+    print('\n\n')
 
-if '__main__' == __name__:
+def q3_result():
 
-    x = [0, 1, 2.2, 3, 4.1, 5.2, 5.9, 6.8, 8.1, 8.7, 9.2, 11, 12.4, 14.1, 15.2, 16.8, 18.7, 19.9]
-    y = [30, 27, 29, 30, 37.3, 36.4, 32.4, 28.5, 30, 34.1, 39, 36, 32, 28, 22, 20, 27, 40]
+    t1 = time.time()
+    print('Part1-3: Linear regression with DFP\n')
+    func = quadratic(2)
+    func.DFP(x, y)
+    t2 = time.time()
+
+    print('\tThe coefficients a0 and a1 for function (a0 + a1 * x) is :\n\ta0 = {:.3f}\n\ta1 = {:.3f}'.format(func.coefs[0], func.coefs[1]))
+    print('\n\tIt cost {:.3f} seconds.'.format(t2 - t1))
+    print('\n\n')
+
+def q4_result():
+
+    t1 = time.time()
+    order = 5
+    print('Part1-2: Quadratic regression with fletcher_reeves\n')
+    func = quadratic(order)
+    func.DFP(x, y)
+
+    t2 = time.time()
+    assert order == len(func.coefs)
+    print('\tFor order k = {}'.format(order))
+    print('\tcoefficients are as below:\n')
+    for i, c in enumerate(func.coefs):
+        print('\ta{} = {:.5f}'.format(i, c))
+
+    print('\n\tIt cost {:.3f} seconds.'.format(t2 - t1))
+    print('\n\n')
+
+def result():
+
 
     q1_result()
     q2_result()
+    q3_result()
+    q4_result()
+
+if '__main__' == __name__:
+
+    result()
