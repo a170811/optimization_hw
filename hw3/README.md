@@ -2,6 +2,8 @@
 
 ## Useage
 
+* Setup the environment and just run the programs below.
+
 1. `$ pip install -r requirement.txt`
 2. `python3 ./q1_regression.py`
 3. `python3 ./q2_numerical.py`
@@ -12,6 +14,6 @@ Then, you can see all the result.
 Note: There are figures in q3 and q4
 
 
-or you can use jupiter notebook to show the results.
+* or you can use jupiter notebook to show the results.
 
 1. Just open the `./show_result.ipynb` can see all the results.
