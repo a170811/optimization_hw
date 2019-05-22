@@ -65,7 +65,7 @@ def result():
 
     print()
 
-    k = 3
+    k = 6
     print('b. Quadratic Regression(order = {}): \n'.format(k))
     vector_a, _ = quadratic(x, y, k)
 
